@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -22,42 +22,40 @@ model User {
 }
 
 model Sample {
-  id           String   @id @default(cuid())
-  kitId        String   @unique
-  collectorId  String
-  collector    User     @relation("CollectorSamples", fields: [collectorId], references: [id])
-  collectedAt  DateTime
-  latitude     Float
-  longitude    Float
-  /// Device GPS captured at submit time (nullable if unavailable)
+  id              String           @id @default(cuid())
+  kitId           String           @unique
+  collectorId     String
+  collector       User             @relation("CollectorSamples", fields: [collectorId], references: [id])
+  collectedAt     DateTime
+  latitude        Float
+  longitude       Float
   deviceLatitude  Float?
   deviceLongitude Float?
   gpsAccuracyM    Float?
-  addressText  String
-  neighborhood String
-  attested     Boolean  @default(false)
-  /// Concatenated SHA-256 hashes of evidence files (stable order)
-  evidenceHash String?
+  addressText     String
+  neighborhood    String
+  attested        Boolean          @default(false)
+  evidenceHash    String?
   /// AWAITING_LAB | COMPLETED | VOID
-  status       String   @default("AWAITING_LAB")
-  createdAt    DateTime @default(now())
-  result       Result?
-  alerts       Alert[]
-  evidence     SampleEvidence[]
+  status          String           @default("AWAITING_LAB")
+  createdAt       DateTime         @default(now())
+  result          Result?
+  alerts          Alert[]
+  evidence        SampleEvidence[]
 }
 
 model SampleEvidence {
-  id         String   @id @default(cuid())
-  sampleId   String
-  sample     Sample   @relation(fields: [sampleId], references: [id], onDelete: Cascade)
+  id          String   @id @default(cuid())
+  sampleId    String
+  sample      Sample   @relation(fields: [sampleId], references: [id], onDelete: Cascade)
   /// KIT_PHOTO | TAP_PHOTO
-  kind       String
-  filename   String
-  mimeType   String
-  sizeBytes  Int
-  sha256     String
+  kind        String
+  filename    String
+  mimeType    String
+  sizeBytes   Int
+  sha256      String
   storagePath String
-  createdAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
 }
 
 model Result {
@@ -82,17 +80,17 @@ model Result {
 }
 
 model Alert {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   resultId     String
-  result       Result   @relation(fields: [resultId], references: [id])
+  result       Result    @relation(fields: [resultId], references: [id])
   sampleId     String
-  sample       Sample   @relation(fields: [sampleId], references: [id])
+  sample       Sample    @relation(fields: [sampleId], references: [id])
   /// EARLY_WARNING | LEGAL_THRESHOLD
   severity     String
   thresholdPpb Float
   observedPpb  Float
   message      String
-  createdAt    DateTime @default(now())
+  createdAt    DateTime  @default(now())
   deliveredAt  DateTime?
 }
 

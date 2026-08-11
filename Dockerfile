@@ -2,12 +2,13 @@ FROM node:20-bookworm-slim
 
 WORKDIR /app
 
-RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
+# Schema must exist before npm install (postinstall / prisma generate).
 COPY package.json package-lock.json* ./
+COPY prisma ./prisma
 RUN npm install
 
-COPY prisma ./prisma
 COPY src ./src
 COPY tsconfig.json ./
 
@@ -17,5 +18,4 @@ ENV NODE_ENV=production
 ENV PORT=4000
 EXPOSE 4000
 
-# Persist SQLite at /data on a Railway volume (mount /data).
-CMD ["sh", "-c", "mkdir -p /data && npx prisma migrate deploy && npm start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
