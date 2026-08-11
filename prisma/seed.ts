@@ -78,6 +78,14 @@ async function attachEvidence(sampleId: string, kitId: string) {
 }
 
 async function main() {
+  const existingUsers = await prisma.user.count();
+  if (existingUsers > 0 && process.env.FORCE_SEED !== "1") {
+    console.log(
+      `Seed skipped: ${existingUsers} user(s) already exist (set FORCE_SEED=1 to reset).`
+    );
+    return;
+  }
+
   await prisma.alert.deleteMany();
   await prisma.result.deleteMany();
   await prisma.sampleEvidence.deleteMany();

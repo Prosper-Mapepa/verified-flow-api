@@ -18,4 +18,5 @@ ENV NODE_ENV=production
 ENV PORT=4000
 EXPOSE 4000
 
-CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
+# Migrate, then seed demo users/data once (no-op if users already exist).
+CMD ["sh", "-c", "npx prisma migrate deploy && npx tsx prisma/seed.ts && npm start"]
