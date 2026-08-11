@@ -148,6 +148,7 @@ samplesRouter.post(
               sizeBytes: s.sizeBytes,
               sha256: s.sha256,
               storagePath: s.storagePath,
+              data: s.data,
             })),
           },
         },
@@ -330,5 +331,6 @@ async function saveEvidenceFromBuffer(params: {
     sizeBytes: params.buffer.length,
     sha256,
     storagePath,
+    data: params.buffer,
   };
 }

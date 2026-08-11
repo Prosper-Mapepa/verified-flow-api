@@ -26,9 +26,12 @@ evidenceRouter.get("/:id", async (req, res) => {
   }
 
   try {
-    const buf = await readFile(evidence.storagePath);
+    const buf =
+      evidence.data && evidence.data.length > 0
+        ? Buffer.from(evidence.data)
+        : await readFile(evidence.storagePath);
     res.setHeader("Content-Type", evidence.mimeType);
-    res.setHeader("Cache-Control", "public, max-age=3600");
+    res.setHeader("Cache-Control", "private, max-age=300");
     res.setHeader("X-Evidence-SHA256", evidence.sha256);
     return res.send(buf);
   } catch {

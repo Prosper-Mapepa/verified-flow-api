@@ -58,6 +58,7 @@ async function attachEvidence(sampleId: string, kitId: string) {
       sizeBytes: f.buf.length,
       sha256,
       storagePath,
+      data: f.buf,
     });
   }
 
