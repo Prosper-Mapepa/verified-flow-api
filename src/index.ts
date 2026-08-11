@@ -6,6 +6,7 @@ import { resultsRouter } from "./routes/results";
 import { alertsRouter } from "./routes/alerts";
 import { evidenceRouter } from "./routes/evidence";
 import { adminRouter } from "./routes/admin";
+import { officialRouter } from "./routes/official";
 
 const app = express();
 const port = Number(process.env.PORT || 4000);
@@ -33,6 +34,7 @@ app.use("/api/results", resultsRouter);
 app.use("/api/alerts", alertsRouter);
 app.use("/api/evidence", evidenceRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/official", officialRouter);
 
 app.listen(port, () => {
   console.log(`Verified Flow API listening on :${port}`);
