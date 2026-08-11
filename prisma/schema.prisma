@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  /// COLLECTOR | LAB | ADMIN
+  role         String
+  orgName      String?
+  createdAt    DateTime @default(now())
+  samples      Sample[] @relation("CollectorSamples")
+  results      Result[] @relation("LabResults")
+  auditEvents  AuditEvent[]
+}
+
+model Sample {
+  id           String   @id @default(cuid())
+  kitId        String   @unique
+  collectorId  String
+  collector    User     @relation("CollectorSamples", fields: [collectorId], references: [id])
+  collectedAt  DateTime
+  latitude     Float
+  longitude    Float
+  /// Device GPS captured at submit time (nullable if unavailable)
+  deviceLatitude  Float?
+  deviceLongitude Float?
+  gpsAccuracyM    Float?
+  addressText  String
+  neighborhood String
+  attested     Boolean  @default(false)
+  /// Concatenated SHA-256 hashes of evidence files (stable order)
+  evidenceHash String?
+  /// AWAITING_LAB | COMPLETED | VOID
+  status       String   @default("AWAITING_LAB")
+  createdAt    DateTime @default(now())
+  result       Result?
+  alerts       Alert[]
+  evidence     SampleEvidence[]
+}
+
+model SampleEvidence {
+  id         String   @id @default(cuid())
+  sampleId   String
+  sample     Sample   @relation(fields: [sampleId], references: [id], onDelete: Cascade)
+  /// KIT_PHOTO | TAP_PHOTO
+  kind       String
+  filename   String
+  mimeType   String
+  sizeBytes  Int
+  sha256     String
+  storagePath String
+  createdAt  DateTime @default(now())
+}
+
+model Result {
+  id               String   @id @default(cuid())
+  sampleId         String   @unique
+  sample           Sample   @relation(fields: [sampleId], references: [id])
+  labUserId        String
+  labUser          User     @relation("LabResults", fields: [labUserId], references: [id])
+  labOrgName       String
+  leadPpb          Float
+  testedAt         DateTime
+  notes            String?
+  payloadCanonical String
+  payloadHash      String
+  signature        String
+  algo             String   @default("HMAC-SHA256")
+  /// SEALED
+  status           String   @default("SEALED")
+  publishedAt      DateTime @default(now())
+  createdAt        DateTime @default(now())
+  alerts           Alert[]
+}
+
+model Alert {
+  id           String   @id @default(cuid())
+  resultId     String
+  result       Result   @relation(fields: [resultId], references: [id])
+  sampleId     String
+  sample       Sample   @relation(fields: [sampleId], references: [id])
+  /// EARLY_WARNING | LEGAL_THRESHOLD
+  severity     String
+  thresholdPpb Float
+  observedPpb  Float
+  message      String
+  createdAt    DateTime @default(now())
+  deliveredAt  DateTime?
+}
+
+model AlertContact {
+  id     String  @id @default(cuid())
+  email  String  @unique
+  label  String
+  active Boolean @default(true)
+}
+
+model AuditEvent {
+  id          String   @id @default(cuid())
+  actorUserId String?
+  actor       User?    @relation(fields: [actorUserId], references: [id])
+  action      String
+  entityType  String
+  entityId    String
+  metadata    String   @default("{}")
+  createdAt   DateTime @default(now())
+}
