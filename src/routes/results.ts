@@ -61,9 +61,8 @@ resultsRouter.post("/:id/verify", async (req, res) => {
     });
     return ok(res, {
       resultId: result.id,
-      ...verification,
-      algo: result.algo,
-      payloadHash: result.payloadHash,
+      valid: verification.valid,
+      reason: verification.reason,
     });
   } catch (e) {
     return fail(res, e);

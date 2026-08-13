@@ -29,7 +29,7 @@ export function labSampleDetail(sample: SampleFull) {
     deviceLongitude: sample.deviceLongitude,
     gpsAccuracyM: sample.gpsAccuracyM,
     attested: sample.attested,
-    evidenceHash: sample.evidenceHash,
+    evidenceBound: Boolean(sample.evidenceHash),
     collector: {
       id: sample.collector.id,
       name: sample.collector.name,
@@ -42,7 +42,6 @@ export function labSampleDetail(sample: SampleFull) {
       kind: e.kind as "KIT_PHOTO" | "TAP_PHOTO",
       filename: e.filename,
       mimeType: e.mimeType,
-      sha256: e.sha256,
       sizeBytes: e.sizeBytes,
       url: `/api/evidence/${e.id}`,
       createdAt: e.createdAt.toISOString(),

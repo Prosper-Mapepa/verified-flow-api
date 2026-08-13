@@ -13,7 +13,7 @@ export function publicEvidence(e: SampleEvidence) {
     kind: e.kind as "KIT_PHOTO" | "TAP_PHOTO",
     filename: e.filename,
     mimeType: e.mimeType,
-    sha256: e.sha256,
+    // Hash withheld from public clients; still bound into the seal server-side.
     url: `/api/evidence/${e.id}`,
   };
 }
@@ -62,10 +62,9 @@ export function publicResult(result: ResultWithSample) {
     longitude: result.sample.longitude,
     addressPublic: result.sample.neighborhood,
     notes: result.notes,
-    algo: result.algo,
-    payloadHash: result.payloadHash,
-    signature: result.signature,
-    evidenceHash: result.sample.evidenceHash,
+    // Cryptographic internals withheld from public UI/API responses.
+    sealed: true,
+    evidenceBound: Boolean(result.sample.evidenceHash),
     verification,
     collectionTrust: trust,
     evidence: evidence.map(publicEvidence),
@@ -96,7 +95,7 @@ export function publicSample(
     attested: sample.attested,
     hasResult: Boolean(sample.result),
     evidenceCount: evidence.length,
-    evidenceHash: sample.evidenceHash,
+    evidenceBound: Boolean(sample.evidenceHash),
     collectionTrust: collectionTrust({
       attested: sample.attested,
       hasKitPhoto: evidence.some((e) => e.kind === "KIT_PHOTO"),
